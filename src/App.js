@@ -1,23 +1,46 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import Coin from "./components/Coin";
+import Loader from "./components/Loader"
+import "./styles/App.css"
 
-function App() {
+
+function App() {  
+
+  const [coins, setCoins] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+
+    const fetchAllCoins = async () => {
+      try {
+        const {data} = await axios.get("https://api.coingecko.com/api/v3/coins/markets?vs_currency=inr&per_page=100")
+        // const {data} = await axios.get("https://api.coingecko.com/api/v3/coins/list")
+
+        console.log(data);
+        setLoading(false);
+        setCoins(data);
+      } catch (error) {
+        alert("Not working")
+      }
+    }
+
+    fetchAllCoins();
+
+  }, []);
+
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className="home">
+      {
+        loading ? (<Loader />) : ( coins.map((item) => {
+          return (
+            <div>
+            <Coin name={item.name} symbol={item.symbol} imgSrc={item.image} price={item.current_price} key={item.id} />
+            </div>
+          )
+        }) )
+      }
     </div>
   );
 }
